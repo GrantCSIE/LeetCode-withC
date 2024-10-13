@@ -1,8 +1,52 @@
 #include <stdio.h>
 #include <stdlib.h>
-/**
- * Note: The returned array must be malloced, assume caller calls free().
- */
+#include <math.h>
+
+// 2 pointer approach with O(n) time complexity and O(n) space complexity
+int* sortedSquares(int* nums, int numsSize, int* returnSize) {
+    int idx_nega;
+    int idx_post;
+
+    nums[numsSize - 1] = abs(nums[numsSize - 1]);
+
+    for(int i = 0; i < numsSize; i++){
+        if(nums[i] >= 0){
+            idx_nega = i - 1;
+            idx_post = i;
+            break;
+        }
+    }
+
+    int *tmp = (int *)malloc(numsSize * sizeof(int));
+    int count = 0;
+    for( ; idx_nega >= 0 && idx_post < numsSize; count++){
+        if(abs(nums[idx_nega]) <= abs(nums[idx_post])){
+            tmp[count] = nums[idx_nega] * nums[idx_nega];
+            idx_nega -= 1;
+        }
+        else if(abs(nums[idx_nega]) > nums[idx_post]){
+            tmp[count] = nums[idx_post] * nums[idx_post];
+            idx_post ++;
+        }
+    }
+    if(idx_nega == -1){
+        for(int i = idx_post; idx_post < numsSize; idx_post++){
+            tmp[count] = nums[idx_post] * nums[idx_post];
+            count++;
+        }
+    }
+    else if(idx_post == numsSize){
+        for(int i = idx_nega; idx_nega >= 0; idx_nega--){
+            tmp[count] = nums[idx_nega] * nums[idx_nega] ;
+            count++;
+        }
+    }
+    *returnSize = numsSize;
+    return tmp;
+}
+
+
+/* approach with squaring each element and sorting
 int* sortedSquares(int* nums, int numsSize, int* returnSize) {
     int* tmparr = (int *)malloc(numsSize * sizeof(int));
     for(int i = 0; i < numsSize; i++){
@@ -20,19 +64,15 @@ int* sortedSquares(int* nums, int numsSize, int* returnSize) {
     *returnSize = numsSize;
     return tmparr;
 }
+*/
 
 
 int main(){
-    int *arr = (int *)malloc(5 * sizeof(int));
-    arr[0] = -4;
-    arr[1] = -1;
-    arr[2] = 0;
-    arr[3] = 3;
-    arr[4] = 10;
-    int numsSize = 5;
+    int nums[] = {-7,-3,2,3,11};
+    int numsSize = sizeof(nums) / sizeof(int);
     int returnSize;
 
-    arr = sortedSquares(arr, numsSize, &returnSize);
+    int *arr = sortedSquares(nums, numsSize, &returnSize);
     for(int i = 0; i < numsSize; i ++){
         printf("%d, ", arr[i]);
     }
